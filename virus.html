@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prank Windows Popup</title>
+    <style>
+      body {
+        margin: 0;
+        background: black;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        overflow: hidden;
+      }
+
+      #startScreen {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+      }
+
+      #startScreen h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      #startScreen button {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 20px;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .popup {
+        position: fixed;
+        width: 300px;
+        background: #ece9d8;
+        border: 2px solid #000;
+        box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.4);
+        border-radius: 0;
+        overflow: hidden;
+        z-index: 999;
+        cursor: move;
+      }
+
+      .popup-header {
+        background: #0a246a;
+        color: white;
+        padding: 6px 10px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .popup-header .close-btn {
+        background: #c00;
+        color: white;
+        border: none;
+        width: 24px;
+        height: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 1;
+      }
+
+      .popup-header .close-btn:hover {
+        background: #900;
+      }
+
+      video {
+        width: 100%;
+        display: block;
+        border-top: 1px solid #999;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="startScreen">
+      <h1>Mau gak jadi pacarku? 😳</h1>
+      <button onclick="startPrank()">Iya</button>
+      <button onclick="startPrank()">Tidak</button>
+    </div>
+
+    <script>
+      let popupActiveCount = 0;
+      let popupTotalCreated = 0;
+      const maxTotal = 7;
+
+      function startPrank() {
+        document.getElementById("startScreen").style.display = "none";
+        createPopup();
+      }
+
+      function createPopup() {
+        if (popupTotalCreated >= maxTotal) return;
+
+        const popup = document.createElement("div");
+        popup.className = "popup";
+        popup.style.top = Math.random() * (window.innerHeight - 320) + "px";
+        popup.style.left = Math.random() * (window.innerWidth - 320) + "px";
+
+        const header = document.createElement("div");
+        header.className = "popup-header";
+        header.innerHTML = `<span>System Message</span>`;
+
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "close-btn";
+        closeBtn.innerText = "×";
+        closeBtn.onclick = () => {
+          document.body.removeChild(popup);
+          popupActiveCount--;
+          if (popupTotalCreated < maxTotal) {
+            createPopup();
+            if (popupTotalCreated + 1 < maxTotal) createPopup();
+          }
+        };
+
+        header.appendChild(closeBtn);
+
+        const video = document.createElement("video");
+        video.src = "video.mp4"; // GANTI DENGAN LINK VIDEO KAMU
+        video.autoplay = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.controls = false;
+        video.muted = false;
+
+        popup.appendChild(header);
+        popup.appendChild(video);
+        document.body.appendChild(popup);
+        dragElement(popup);
+
+        popupActiveCount++;
+        popupTotalCreated++;
+      }
+
+      function dragElement(elmnt) {
+        let pos1 = 0,
+          pos2 = 0,
+          pos3 = 0,
+          pos4 = 0;
+        elmnt.onmousedown = dragMouseDown;
+        elmnt.ontouchstart = dragMouseDown;
+
+        function dragMouseDown(e) {
+          e.preventDefault();
+          const evt = e.touches ? e.touches[0] : e;
+          pos3 = evt.clientX;
+          pos4 = evt.clientY;
+          document.onmouseup = closeDragElement;
+          document.onmousemove = elementDrag;
+          document.ontouchend = closeDragElement;
+          document.ontouchmove = elementDrag;
+        }
+
+        function elementDrag(e) {
+          e.preventDefault();
+          const evt = e.touches ? e.touches[0] : e;
+          pos1 = pos3 - evt.clientX;
+          pos2 = pos4 - evt.clientY;
+          pos3 = evt.clientX;
+          pos4 = evt.clientY;
+          elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+          elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+        }
+
+        function closeDragElement() {
+          document.onmouseup = null;
+          document.onmousemove = null;
+          document.ontouchend = null;
+          document.ontouchmove = null;
+        }
+      }
+    </script>
+  </body>
+</html>
